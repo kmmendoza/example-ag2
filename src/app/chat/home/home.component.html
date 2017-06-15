@@ -1,0 +1,36 @@
+<div class="panel panel-default">
+  <div class="panel-body">
+    <ngb-alert type="success" *ngIf="socket.connected">
+      <strong>Connected!</strong> You are online...
+    </ngb-alert>
+    <ngb-alert type="danger" *ngIf="!socket.connected">
+      <strong>Error!</strong> The chat server is offline...
+    </ngb-alert>
+  </div>
+</div>
+<div>
+  <div class="panel panel-default">
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-sm-6 col-md-4">
+          <div class="panel panel-default">
+            <div class="panel-heading">Online users</div>
+            <div class="panel-body">
+              <div class="list-group">
+                <a href="#" class="list-group-item" *ngFor="let user of usersList">{{user.nickName}}</a>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-sm-6 col-md-8">
+          <div class="panel panel-default">
+            <div class="panel-heading">Additional info</div>
+            <div class="panel-body">
+              something here...
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

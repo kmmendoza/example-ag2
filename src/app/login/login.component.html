@@ -1,0 +1,8 @@
+<div class="container">
+  <ngb-alert type="danger" *ngIf="loginService.submittedForm && loginService.sessionUser == null">
+    <strong>Error!</strong> User or password incorrect, check your credentials...
+  </ngb-alert>
+ 
+  <div *ngIf="loginService.sessionUser">{{loginService.sessionUser.firstName}}</div>
+  <login-form></login-form>
+</div>
