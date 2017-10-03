@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { LoginService } from '../../login/login-service.service';
 import { BackendWSServiceService } from '../../services/backend-wsservice.service';
 @Component({
   selector: 'app-home',
@@ -6,9 +7,7 @@ import { BackendWSServiceService } from '../../services/backend-wsservice.servic
   styleUrls: ['./home.component.css'],
   providers: [BackendWSServiceService]
 })
-export class HomeComponent implements OnInit {
-
-  private socket: BackendWSServiceService;
+export class HomeComponent implements OnInit {  
 
   private usersList = [{ nickName: 'ninck1' },
    {nickName:'nick2'},
@@ -17,13 +16,12 @@ export class HomeComponent implements OnInit {
     {nickName:'nick5'},
     {nickName:'nick6'}];
 
-  constructor(socket: BackendWSServiceService) {
-    this.socket = socket;
+  constructor(private socket: BackendWSServiceService, private loginService: LoginService) {    
 
   }
 
   ngOnInit() {
-
+console.log(this.loginService.sessionUser);
     this.socket.connectToSocket().then(() => {
       this.socket.subscribeToChatQueue();     
       this.socket.sendMessage('Holaaa back');

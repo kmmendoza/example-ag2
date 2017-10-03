@@ -15,7 +15,7 @@ export class BackendWSServiceService {
     this.stomp.configure({
       host: environment.wsUrl,
       debug: true,
-      queue: { 'init': false, 'chat': false, 'notifications': false }
+      queue: { 'init': false, 'chats': false, 'notifications': false }
     });
   }
 
@@ -37,8 +37,8 @@ export class BackendWSServiceService {
 
   //subscribe to chat
   public subscribeToChatQueue() {
-    this.subscription = this.stomp.subscribe('/uichat', (data)=>{
-        this.stomp.done('chat');
+    this.subscription = this.stomp.subscribe('/chats', (data)=>{
+        this.stomp.done('chats');
         console.log('received: ' + data);
     });
     // console.log(this.subscription);   
@@ -55,7 +55,8 @@ export class BackendWSServiceService {
 
   //send chat message
   public sendMessage(message: String) {
-    this.stomp.send('/app/sendMessage/1', {
+    this.stomp.send('/app/sendChatMessage/1', {
+		ipmo: 1,
       message: message,
       fromUserId: 'x',
       toUserId: 'y'

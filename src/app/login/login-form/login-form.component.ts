@@ -17,7 +17,9 @@ export class LoginFormComponent implements OnInit {
   }
 
   doLogin() {
-    this.loginService.doLogin(this.model.email, this.model.password);
+    this.loginService.doLogin(this.model);
+
+    this.loginService.doTest();
   }
 
   ngOnInit() {

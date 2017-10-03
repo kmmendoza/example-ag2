@@ -1,8 +1,11 @@
 import { Injectable } from '@angular/core';
-import { TokenService } from 'angular2-auth';
 import { BackendHttpService } from '../services/backend-httpservice.service';
 import { User } from '../models/user';
-import {Router} from '@angular/router';
+import { LoginModel } from './login.model';
+import { Router } from '@angular/router';
+import { JwtHelper } from 'angular2-jwt';
+import { tokenNotExpired } from 'angular2-jwt';
+
 @Injectable()
 export class LoginService {
 
@@ -14,6 +17,10 @@ export class LoginService {
   }
 
   get sessionUser(): User {
+    if (this.checkAuthenticated()) {
+      this.getUserDataFromLocalStorage();
+    }
+
     return this._sessionUser;
   }
 
@@ -25,32 +32,79 @@ export class LoginService {
     return this._errorMessage;
   }
 
+  doTest() {
+    this.backendHttpserviceService.doPostRequest('/test', null, {}).subscribe(
+      data => console.log(data),
+      error => console.log(error));
+  }
 
-  doLogin(email: String, password: String) {
+
+  doLogin(loginModel: LoginModel) {
     this._submittedForm = true;
     this._sessionUser = null;
-    let user = new User(null, null, email, password, null, null, null);
-    this.backendHttpserviceService.doPostRequest('/login', null, user)
-      .subscribe(
-      data => this.updateUserData(data),
+    this._errorMessage = null;
+    let dataCreds = { "email": loginModel.email, "password": loginModel.password };
+    this.backendHttpserviceService.doPostLogin('/login', null, dataCreds).subscribe(
+      data => this.setUserDataToLocalStorage(data),
       error => this.updateErrorMsg(error));
   }
 
 
-  updateUserData(data: any) {   
-    let user = <User>data.user;
-    console.log(user);
-    if (user != null) { 
-      this._sessionUser = user;
+  setUserDataToLocalStorage(loginResponse: any) {
+
+    let authHeaders = loginResponse.headers;
+    let authToken = authHeaders.get('authorization');
+    if (authToken) {
+      //Store the token
+      localStorage.setItem('token', authToken);
       this.router.navigate(['/chat']);
-     }
+    }
+
   }
 
+
+  getUserDataFromLocalStorage() {
+    //Update logged user data
+    let jwtHelper = new JwtHelper();
+    let authToken = localStorage.getItem('token');
+    if (authToken) {
+      let decodedToken = jwtHelper.decodeToken(authToken);
+      if (decodedToken) {
+        this._sessionUser = new User(decodedToken.id, decodedToken.username, decodedToken.sub, 'password',
+          decodedToken.firstname, decodedToken.lastname, decodedToken.status);
+      }
+    }
+
+  }
 
   updateErrorMsg(error) {
-    this._submittedForm = false;
-    this._errorMessage = <any>error;
-    console.log(error);
+    this._sessionUser = null;
+    this._submittedForm = true;
+
+    if (error.status == 401) {
+      this._errorMessage = 'Check your credentials...';
+    } else if (error.status < 200 || error.status > 300) {
+      this._errorMessage = 'Problems with app server conections, contact administrator...';
+    } else {
+      this._errorMessage = 'Error, contact administrator: ' + error.toString();
+    }
   }
+
+  checkAuthenticated() {
+    let token = localStorage.getItem('token');
+    if (!token) {
+      return false;
+    }
+    if (!tokenNotExpired()) {
+      return false;
+    }
+    return true;
+  }
+
+  doLogout() {
+    localStorage.removeItem('token');
+  }
+
+
 
 }

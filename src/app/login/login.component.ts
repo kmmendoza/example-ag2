@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { LoginService } from './login-service.service';
 import { User } from '../models/user';
+import { LoginService } from './login-service.service';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
@@ -8,10 +8,7 @@ import { User } from '../models/user';
 })
 export class LoginComponent implements OnInit {
 
- 
-
-  constructor(private loginService: LoginService) { 
-   
+  constructor(private loginService: LoginService) {    
    
   }
 
